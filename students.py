@@ -1,0 +1,11 @@
+STUDENT_LIST = ['',
+'Tom',
+'Bob',
+'Mary',
+'Patrick',
+'John',
+'Angela',
+'Jacob',
+'Olivia',
+'Michael',
+'Sophia',]
