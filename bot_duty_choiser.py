@@ -2,16 +2,13 @@ import telebot
 from threading import Thread
 import datetime
 from students import STUDENT_LIST
+from config import CHAT_ID, TOKEN
 import time
 import json
-
-TOKEN = 'TELEGRAMM BOT TOKEN'
 
 bot = telebot.TeleBot(TOKEN)
 
 print(datetime.datetime.now())
-
-CHAT_ID = 0 #CHAT ID
 mes = {}
 
 now_one = datetime.datetime.now()
