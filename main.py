@@ -19,11 +19,43 @@ def main():
         duty_bot.new_day()
 
     @bot.message_handler(commands=['end_day'])
-    def _start_day(message):
+    def _end_day(message):
         duty_bot.end_day()
 
+    @bot.message_handler(commands=["skip"])
+    def skip(message):
+        """
+        Adds the current duty officer to the absent list and moves on to the next one.
+        """
+        duty_bot.process_skip()
+
+    @bot.message_handler(commands=["put"])
+    def put(message):
+        """
+        Place the missing student on duty.
+        Command format: /put <Student_name>.
+        """
+        student_name = message.text.replace("/put ", "").strip()
+        duty_bot.process_put(student_name)
+
+    @bot.message_handler(commands=["set"])
+    def set_duty(message):
+        """
+        Set a specific student as the on-duty student.
+        Command format: /set <Student_name>.
+        """
+        student_name = message.text.replace("/set ", "").strip()
+        duty_bot.process_set(student_name)
+
+    @bot.message_handler(commands=["skip_queue"])
+    def skip_without_queue(message):
+        """
+        Skip the current duty without taking into account his absence.
+        """
+        duty_bot.skip_queue()
+
     # Start a background thread to check the time
-    #Thread(target=duty_bot.check_time).start()
+    Thread(target=duty_bot.check_time).start()
 
     # Bot start
     bot.polling()
