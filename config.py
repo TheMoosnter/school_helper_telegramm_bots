@@ -6,6 +6,8 @@ load_dotenv()
 TOKEN = os.getenv('TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')
 
+DATA_FILE = "data.yaml"
+
 STUDENT_LIST = ['',
 'Tom',
 'Bob',
@@ -16,4 +18,4 @@ STUDENT_LIST = ['',
 'Jacob',
 'Olivia',
 'Michael',
-'Sophia',]
+'Sophia']
