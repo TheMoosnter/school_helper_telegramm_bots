@@ -27,7 +27,7 @@ class DutyBot:
         """
         if not os.path.exists(DATA_FILE):
             logger.warning("Файл данных не найден. Создается новый.")
-            return {"id": 0, "a": 0, "absent_students": []}
+            return {"id": 1, "a": 0, "absent_students": []}
         with open(DATA_FILE, "r") as file:
             return yaml.safe_load(file)
 
@@ -69,4 +69,73 @@ class DutyBot:
         Checks if the identifier is greater than the number of students.
         """
         if self.data["id"] >= len(STUDENT_LIST):
-            self.data["id"] = 0
+            self.data["id"] = 1
+
+
+    def process_skip(self):
+        """
+        Adds the current duty officer to the absent list and moves on to the next one.
+        """
+        if self.mes:
+            self.bot.delete_message(self.chat_id, self.mes.id)
+        self.data["absent_students"].append(STUDENT_LIST[self.data["id"]])
+        self.increment_id()
+        self.check_id()
+        self.save_data()
+        self.new_day()
+
+    def process_put(self, student_name):
+        """
+        Sets the missing student as the duty.
+
+        :param student_name: Student name.
+        """
+        if student_name in self.data["absent_students"]:
+            if self.mes:
+                self.bot.delete_message(self.chat_id, self.mes.id)
+            self.data["a"] = STUDENT_LIST.index(student_name)
+            self.data["absent_students"].remove(student_name)
+            self.save_data()
+            self.new_day(self.data["a"])
+        else:
+            self.bot.send_message(self.chat_id, "No such person found in the list")
+
+    def process_set(self, student_name):
+        """
+        Sets the specified student as the on-duty student.
+
+        :param student_name: Student name.
+        """
+        if student_name in STUDENT_LIST:
+            if self.mes:
+                self.bot.delete_message(self.chat_id, self.mes.id)
+            self.data["id"] = STUDENT_LIST.index(student_name)
+            self.save_data()
+            self.new_day()
+        else:
+            self.bot.send_message(self.chat_id, "No such person found in the list")
+
+    def skip_queue(self):
+        """
+        Allows the current person on duty to pass without taking into account their absence.
+        """
+        if self.mes:
+            self.bot.delete_message(self.chat_id, self.mes.id)
+        self.increment_id()
+        self.check_id()
+        self.save_data()
+        self.new_day()
+
+    def check_time(self):
+        """
+        Background task for checking time. Updates the duty officer every day at 8:00.
+        """
+        while True:
+            now = datetime.datetime.now()
+            if now.weekday() < 6 and now.hour == 8 and now.minute == 0:
+                logger.info("Обновление дежурного дня")
+                self.end_day()
+                self.new_day()
+                time.sleep(60)
+            else:
+                time.sleep(59)
