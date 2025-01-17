@@ -5,8 +5,8 @@ import yaml
 from loguru import logger
 from config import DATA_FILE, STUDENT_LIST
 
-class DutyBot:
 
+class DutyBot:
     def __init__(self, bot, chat_id):
         """
         Initialization of DutyBot.
@@ -39,14 +39,17 @@ class DutyBot:
             yaml.safe_dump(self.data, file)
         logger.debug("Данные сохранены")
 
-    def new_day(self, student_index = None):
+    def new_day(self, student_index=None):
         """
         Updates information about the person on duty for the new day.
         """
 
         student_index = student_index if student_index is not None else self.data["id"]
         abs_stud = ", ".join(self.data["absent_students"])
-        self.mes = self.bot.send_message(self.chat_id, f'{STUDENT_LIST[student_index]} is on duty today\nMissed duty: {abs_stud}')
+        self.mes = self.bot.send_message(
+            self.chat_id,
+            f"{STUDENT_LIST[student_index]} is on duty today\nMissed duty: {abs_stud}",
+        )
 
     def end_day(self):
         """
@@ -70,7 +73,6 @@ class DutyBot:
         """
         if self.data["id"] >= len(STUDENT_LIST):
             self.data["id"] = 1
-
 
     def process_skip(self):
         """
