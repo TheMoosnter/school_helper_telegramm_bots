@@ -5,6 +5,7 @@ from telebot import TeleBot
 from config import TOKEN, CHAT_ID, DATA_FILE
 from utils import DutyBot
 
+
 def main():
     """
     Entry point to the application. Initializes the bot and starts the main processes.
@@ -14,11 +15,11 @@ def main():
     duty_bot = DutyBot(bot, CHAT_ID)
 
     # Command handlers
-    @bot.message_handler(commands = ['start_day'])
+    @bot.message_handler(commands=["start_day"])
     def _start_day(message):
         duty_bot.new_day()
 
-    @bot.message_handler(commands=['end_day'])
+    @bot.message_handler(commands=["end_day"])
     def _end_day(message):
         duty_bot.end_day()
 
@@ -63,4 +64,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
