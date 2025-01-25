@@ -26,7 +26,7 @@ class DutyBot:
         :return: Duty's data.
         """
         if not os.path.exists(DATA_FILE):
-            logger.warning("Файл данных не найден. Создается новый.")
+            logger.warning("Data file not found. Creating a new one.")
             return {"id": 1, "a": 0, "absent_students": []}
         with open(DATA_FILE, "r") as file:
             return yaml.safe_load(file)
@@ -37,7 +37,7 @@ class DutyBot:
         """
         with open(DATA_FILE, "w") as file:
             yaml.safe_dump(self.data, file)
-        logger.debug("Данные сохранены")
+        logger.debug("Data was saved")
 
     def new_day(self, student_index=None):
         """
@@ -135,7 +135,7 @@ class DutyBot:
         while True:
             now = datetime.datetime.now()
             if now.weekday() < 6 and now.hour == 8 and now.minute == 0:
-                logger.info("Обновление дежурного дня")
+                logger.info("Day duty update")
                 self.end_day()
                 self.new_day()
                 time.sleep(60)

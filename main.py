@@ -4,13 +4,16 @@ from loguru import logger
 from telebot import TeleBot
 from config import TOKEN, CHAT_ID, DATA_FILE
 from utils import DutyBot
+import datetime
 
 
 def main():
     """
     Entry point to the application. Initializes the bot and starts the main processes.
     """
-    logger.info("Запуск телеграм-бота")
+    logger.info("Launching a telegram bot")
+    now_one = datetime.datetime.now()
+    logger.info(f"Hours: {now_one.hour}, minutes: {now_one.minute}")
     bot = TeleBot(TOKEN)
     duty_bot = DutyBot(bot, CHAT_ID)
 
