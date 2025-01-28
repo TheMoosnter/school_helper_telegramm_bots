@@ -1,8 +1,7 @@
-import time
 from threading import Thread
 from loguru import logger
 from telebot import TeleBot
-from config import TOKEN, CHAT_ID, DATA_FILE
+from config import TOKEN, CHAT_ID
 from utils import DutyBot
 import datetime
 
