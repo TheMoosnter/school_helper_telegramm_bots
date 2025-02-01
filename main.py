@@ -1,7 +1,7 @@
 from threading import Thread
 from loguru import logger
 from telebot import TeleBot
-from config import TOKEN, CHAT_ID
+from config import TOKEN, CHAT_ID, DataManager
 from utils import DutyBot
 import datetime
 
@@ -14,7 +14,8 @@ def main():
     now_one = datetime.datetime.now()
     logger.info(f"Hours: {now_one.hour}, minutes: {now_one.minute}")
     bot = TeleBot(TOKEN)
-    duty_bot = DutyBot(bot, CHAT_ID)
+    data_manager = DataManager()
+    duty_bot = DutyBot(bot, CHAT_ID, data_manager)
 
     # Command handlers
     @bot.message_handler(commands=["start_day"])

@@ -1,13 +1,11 @@
-import os
 import time
 import datetime
-import yaml
 from loguru import logger
-from config import DATA_FILE, STUDENT_LIST
+from config import STUDENT_LIST
 
 
 class DutyBot:
-    def __init__(self, bot, chat_id):
+    def __init__(self, bot, chat_id, data_manager):
         """
         Initialization of DutyBot.
 
@@ -16,36 +14,16 @@ class DutyBot:
         """
         self.bot = bot
         self.chat_id = chat_id
-        self.data = self.load_data()
+        self.data_manager = data_manager
         self.mes = None
-
-    def load_data(self):
-        """
-        Load data from the YAML file.
-
-        :return: Duty's data.
-        """
-        if not os.path.exists(DATA_FILE):
-            logger.warning("Data file not found. Creating a new one.")
-            return {"id": 1, "a": 0, "absent_students": []}
-        with open(DATA_FILE, "r") as file:
-            return yaml.safe_load(file)
-
-    def save_data(self):
-        """
-        Save data in the YAML file.
-        """
-        with open(DATA_FILE, "w") as file:
-            yaml.safe_dump(self.data, file)
-        logger.debug("Data was saved")
 
     def new_day(self, student_index=None):
         """
         Updates information about the person on duty for the new day.
         """
 
-        student_index = student_index if student_index is not None else self.data["id"]
-        abs_stud = ", ".join(self.data["absent_students"])
+        student_index = student_index if student_index is not None else self.data_manager.get("id", 0)
+        abs_stud = ", ".join(self.data_manager.get("absent_students", []))
         self.mes = self.bot.send_message(
             self.chat_id,
             f"{STUDENT_LIST[student_index]} is on duty today\nMissed duty: {abs_stud}",
@@ -55,24 +33,23 @@ class DutyBot:
         """
         Ends the current duty day and updates the counter.
         """
-        if self.data["a"] == 0:
+        if self.data_manager.get("a") == 0:
             self.increment_id()
             self.check_id()
-        self.data["a"] = 0
-        self.save_data()
+        self.data_manager.set("a", 0)
 
     def increment_id(self):
         """
         Increments the ID of the current duty officer.
         """
-        self.data["id"] += 1
+        self.data_manager.set("id", self.data_manager.get("id", 0) + 1)
 
     def check_id(self):
         """
         Checks if the identifier is greater than the number of students.
         """
-        if self.data["id"] >= len(STUDENT_LIST):
-            self.data["id"] = 1
+        if self.data_manager.get("id") >= len(STUDENT_LIST):
+            self.data_manager.set("id", 1)
 
     def process_skip(self):
         """
@@ -80,10 +57,9 @@ class DutyBot:
         """
         if self.mes:
             self.bot.delete_message(self.chat_id, self.mes.id)
-        self.data["absent_students"].append(STUDENT_LIST[self.data["id"]])
+        self.data_manager.append_to_list("absent_students", STUDENT_LIST[self.data_manager.get("id", 0)])
         self.increment_id()
         self.check_id()
-        self.save_data()
         self.new_day()
 
     def process_put(self, student_name):
@@ -92,13 +68,13 @@ class DutyBot:
 
         :param student_name: Student name.
         """
-        if student_name in self.data["absent_students"]:
+        absent_students = self.data_manager.get("absent_students", [])
+        if student_name in absent_students:
             if self.mes:
                 self.bot.delete_message(self.chat_id, self.mes.id)
-            self.data["a"] = STUDENT_LIST.index(student_name)
-            self.data["absent_students"].remove(student_name)
-            self.save_data()
-            self.new_day(self.data["a"])
+            self.data_manager.set("a", STUDENT_LIST.index(student_name))
+            self.data_manager.remove_from_list("absent_students", student_name)
+            self.new_day(self.data_manager.get("a"))
         else:
             self.bot.send_message(self.chat_id, "No such person found in the list")
 
@@ -111,8 +87,8 @@ class DutyBot:
         if student_name in STUDENT_LIST:
             if self.mes:
                 self.bot.delete_message(self.chat_id, self.mes.id)
-            self.data["id"] = STUDENT_LIST.index(student_name)
-            self.save_data()
+            self.data_manager.set("id", STUDENT_LIST.index(student_name))
+            self.new_day(self.data_manager.get("id"))
             self.new_day()
         else:
             self.bot.send_message(self.chat_id, "No such person found in the list")
@@ -125,7 +101,6 @@ class DutyBot:
             self.bot.delete_message(self.chat_id, self.mes.id)
         self.increment_id()
         self.check_id()
-        self.save_data()
         self.new_day()
 
     def check_time(self):
