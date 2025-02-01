@@ -1,11 +1,10 @@
 import time
 import datetime
 from loguru import logger
-from config import STUDENT_LIST
 
 
 class DutyBot:
-    def __init__(self, bot, chat_id, data_manager):
+    def __init__(self, bot, chat_id, student_list, data_manager):
         """
         Initialization of DutyBot.
 
@@ -14,6 +13,7 @@ class DutyBot:
         """
         self.bot = bot
         self.chat_id = chat_id
+        self.student_list = student_list
         self.data_manager = data_manager
         self.mes = None
 
@@ -26,7 +26,7 @@ class DutyBot:
         abs_stud = ", ".join(self.data_manager.get("absent_students", []))
         self.mes = self.bot.send_message(
             self.chat_id,
-            f"{STUDENT_LIST[student_index]} is on duty today\nMissed duty: {abs_stud}",
+            f"{self.student_list[student_index]} is on duty today\nMissed duty: {abs_stud}",
         )
 
     def end_day(self):
@@ -48,7 +48,7 @@ class DutyBot:
         """
         Checks if the identifier is greater than the number of students.
         """
-        if self.data_manager.get("id") >= len(STUDENT_LIST):
+        if self.data_manager.get("id") >= len(self.student_list):
             self.data_manager.set("id", 1)
 
     def process_skip(self):
@@ -57,7 +57,7 @@ class DutyBot:
         """
         if self.mes:
             self.bot.delete_message(self.chat_id, self.mes.id)
-        self.data_manager.append_to_list("absent_students", STUDENT_LIST[self.data_manager.get("id", 0)])
+        self.data_manager.append_to_list("absent_students", self.student_list[self.data_manager.get("id", 0)])
         self.increment_id()
         self.check_id()
         self.new_day()
@@ -72,7 +72,7 @@ class DutyBot:
         if student_name in absent_students:
             if self.mes:
                 self.bot.delete_message(self.chat_id, self.mes.id)
-            self.data_manager.set("a", STUDENT_LIST.index(student_name))
+            self.data_manager.set("a", self.student_list.index(student_name))
             self.data_manager.remove_from_list("absent_students", student_name)
             self.new_day(self.data_manager.get("a"))
         else:
@@ -84,10 +84,10 @@ class DutyBot:
 
         :param student_name: Student name.
         """
-        if student_name in STUDENT_LIST:
+        if student_name in self.student_list:
             if self.mes:
                 self.bot.delete_message(self.chat_id, self.mes.id)
-            self.data_manager.set("id", STUDENT_LIST.index(student_name))
+            self.data_manager.set("id", self.student_list.index(student_name))
             self.new_day(self.data_manager.get("id"))
             self.new_day()
         else:
@@ -109,7 +109,7 @@ class DutyBot:
         """
         while True:
             now = datetime.datetime.now()
-            if now.weekday() < 6 and now.hour == 8 and now.minute == 0:
+            if now.weekday() < 6 and now.hour == 23 and now.minute == 10:
                 logger.info("Day duty update")
                 self.end_day()
                 self.new_day()
