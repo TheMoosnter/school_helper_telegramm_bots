@@ -28,6 +28,7 @@ class DutyBot:
             self.chat_id,
             f"{self.student_list[student_index]} is on duty today\nMissed duty: {abs_stud}",
         )
+        logger.info(f"New duty selected: {self.student_list[student_index]}")
 
     def end_day(self):
         """
@@ -50,6 +51,7 @@ class DutyBot:
         """
         if self.data_manager.get("id") >= len(self.student_list):
             self.data_manager.set("id", 1)
+            logger.info(f"Student list was started anew.")
 
     def process_skip(self):
         """
@@ -57,6 +59,7 @@ class DutyBot:
         """
         if self.mes:
             self.bot.delete_message(self.chat_id, self.mes.id)
+        logger.info(f"Student {self.student_list[self.data_manager.get("id", 0)]} was marked as absent.")
         self.data_manager.append_to_list("absent_students", self.student_list[self.data_manager.get("id", 0)])
         self.increment_id()
         self.check_id()
@@ -72,6 +75,7 @@ class DutyBot:
         if student_name in absent_students:
             if self.mes:
                 self.bot.delete_message(self.chat_id, self.mes.id)
+            logger.info("The absent student was appointed on duty.")
             self.data_manager.set("a", self.student_list.index(student_name))
             self.data_manager.remove_from_list("absent_students", student_name)
             self.new_day(self.data_manager.get("a"))
@@ -87,9 +91,9 @@ class DutyBot:
         if student_name in self.student_list:
             if self.mes:
                 self.bot.delete_message(self.chat_id, self.mes.id)
+            logger.info("The student was appointed on duty manually.")
             self.data_manager.set("id", self.student_list.index(student_name))
             self.new_day(self.data_manager.get("id"))
-            self.new_day()
         else:
             self.bot.send_message(self.chat_id, "No such person found in the list")
 
@@ -99,6 +103,7 @@ class DutyBot:
         """
         if self.mes:
             self.bot.delete_message(self.chat_id, self.mes.id)
+        logger.info("The student skipped his duty.")
         self.increment_id()
         self.check_id()
         self.new_day()

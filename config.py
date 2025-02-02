@@ -97,11 +97,23 @@ class DataManager:
             self.data[key].remove(value)
             self.save_data()
 
+# Configure logging
+LOG_DIR = "logs"
+LOG_FILE = os.path.join(LOG_DIR, "bot.log")
+
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
+logger.add(LOG_FILE, rotation="10 MB", level="INFO", format="{time} {level} {message}")
+
+# Load data from .env file
 load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
+# File for saving program variables
 DATA_FILE = "data.yaml"
 
+# Loading of student list from .cvs file to list constant
 STUDENT_LIST = load_students("students.csv")
