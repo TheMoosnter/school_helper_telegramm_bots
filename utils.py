@@ -17,6 +17,16 @@ class DutyBot:
         self.data_manager = data_manager
         self.mes = None
 
+    def check_student_in_list(self, student, list):
+        """
+        Checks if a student exists in the given list.
+
+        :param student: Name of the student to check.
+        :param list: List in which exist of the student is checked
+        :return: True if the student exists, False otherwise.
+        """
+        return student in list
+
     def new_day(self, student_index=None):
         """
         Updates information about the person on duty for the new day.
@@ -51,7 +61,7 @@ class DutyBot:
         """
         if self.data_manager.get("id") >= len(self.student_list):
             self.data_manager.set("id", 1)
-            logger.info(f"Student list was started anew.")
+            logger.info("Student list was started anew.")
 
     def process_skip(self):
         """
@@ -65,14 +75,15 @@ class DutyBot:
         self.check_id()
         self.new_day()
 
-    def process_put(self, student_name):
+    def process_put(self, student_name, personal_mes_chat_id):
         """
         Sets the missing student as the duty.
 
         :param student_name: Student name.
+        :param student_name: Author chat id (for send error message)
         """
         absent_students = self.data_manager.get("absent_students", [])
-        if student_name in absent_students:
+        if self.check_student_in_list(student_name, absent_students):
             if self.mes:
                 self.bot.delete_message(self.chat_id, self.mes.id)
             logger.info("The absent student was appointed on duty.")
@@ -80,22 +91,22 @@ class DutyBot:
             self.data_manager.remove_from_list("absent_students", student_name)
             self.new_day(self.data_manager.get("a"))
         else:
-            self.bot.send_message(self.chat_id, "No such person found in the list")
+            self.bot.send_message(personal_mes_chat_id, "No such person found in the list")
 
-    def process_set(self, student_name):
+    def process_set(self, student_name, personal_mes_chat_id):
         """
         Sets the specified student as the on-duty student.
 
         :param student_name: Student name.
         """
-        if student_name in self.student_list:
+        if self.check_student_in_list(student_name, self.student_list):
             if self.mes:
                 self.bot.delete_message(self.chat_id, self.mes.id)
             logger.info("The student was appointed on duty manually.")
             self.data_manager.set("id", self.student_list.index(student_name))
             self.new_day(self.data_manager.get("id"))
         else:
-            self.bot.send_message(self.chat_id, "No such person found in the list")
+            self.bot.send_message(personal_mes_chat_id, "No such person found in the list")
 
     def skip_queue(self):
         """

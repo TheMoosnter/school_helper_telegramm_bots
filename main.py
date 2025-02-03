@@ -40,7 +40,7 @@ def main():
         Command format: /put <Student_name>.
         """
         student_name = message.text.replace("/put ", "").strip()
-        duty_bot.process_put(student_name)
+        duty_bot.process_put(student_name, message.chat.id)
 
     @bot.message_handler(commands=["set"])
     def set_duty(message):
@@ -49,7 +49,7 @@ def main():
         Command format: /set <Student_name>.
         """
         student_name = message.text.replace("/set ", "").strip()
-        duty_bot.process_set(student_name)
+        duty_bot.process_set(student_name, message.chat.id)
 
     @bot.message_handler(commands=["skip_queue"])
     def skip_without_queue(message):
