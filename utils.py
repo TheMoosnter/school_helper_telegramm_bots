@@ -32,7 +32,11 @@ class DutyBot:
         Updates information about the person on duty for the new day.
         """
 
-        student_index = student_index if student_index is not None else self.data_manager.get("id", 0)
+        student_index = (
+            student_index
+            if student_index is not None
+            else self.data_manager.get("id", 0)
+        )
         abs_stud = ", ".join(self.data_manager.get("absent_students", []))
         self.mes = self.bot.send_message(
             self.chat_id,
@@ -69,8 +73,12 @@ class DutyBot:
         """
         if self.mes:
             self.bot.delete_message(self.chat_id, self.mes.id)
-        logger.info(f"Student {self.student_list[self.data_manager.get("id", 0)]} was marked as absent.")
-        self.data_manager.append_to_list("absent_students", self.student_list[self.data_manager.get("id", 0)])
+        logger.info(
+            f"Student {self.student_list[self.data_manager.get("id", 0)]} was marked as absent."
+        )
+        self.data_manager.append_to_list(
+            "absent_students", self.student_list[self.data_manager.get("id", 0)]
+        )
         self.increment_id()
         self.check_id()
         self.new_day()
@@ -91,7 +99,9 @@ class DutyBot:
             self.data_manager.remove_from_list("absent_students", student_name)
             self.new_day(self.data_manager.get("a"))
         else:
-            self.bot.send_message(personal_mes_chat_id, "No such person found in the list")
+            self.bot.send_message(
+                personal_mes_chat_id, "No such person found in the list"
+            )
 
     def process_set(self, student_name, personal_mes_chat_id):
         """
@@ -106,7 +116,9 @@ class DutyBot:
             self.data_manager.set("id", self.student_list.index(student_name))
             self.new_day(self.data_manager.get("id"))
         else:
-            self.bot.send_message(personal_mes_chat_id, "No such person found in the list")
+            self.bot.send_message(
+                personal_mes_chat_id, "No such person found in the list"
+            )
 
     def skip_queue(self):
         """

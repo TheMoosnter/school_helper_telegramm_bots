@@ -4,13 +4,14 @@ import csv
 from loguru import logger
 import yaml
 
+
 def load_students(file_path):
     """
     Loads a list of students from a CSV file as a Python list.
     :param file_path: Path to CSV file.
     :return: Students' names list.
     """
-    students = ['']
+    students = [""]
     try:
         with open(file_path, mode="r") as file:
             reader = csv.DictReader(file)
@@ -22,6 +23,7 @@ def load_students(file_path):
     except KeyError:
         logger.error(f"Column 'name' absent in {file_path}.")
     return students
+
 
 class DataManager:
     """Handles loading, saving, and modifying data in the data.yaml file."""
@@ -96,6 +98,7 @@ class DataManager:
         if key in self.data and value in self.data[key]:
             self.data[key].remove(value)
             self.save_data()
+
 
 # Configure logging
 LOG_DIR = "logs"
