@@ -1,9 +1,11 @@
-import telebot
-from threading import Thread
 import datetime
-from config import CHAT_ID, TOKEN, STUDENT_LIST
-import time
 import json
+import time
+from threading import Thread
+
+import telebot
+
+from config import CHAT_ID, STUDENT_LIST, TOKEN
 
 bot = telebot.TeleBot(TOKEN)
 
