@@ -1,9 +1,11 @@
+import datetime
 from threading import Thread
+
 from loguru import logger
 from telebot import TeleBot
-from config import TOKEN, CHAT_ID, STUDENT_LIST, DataManager
+
+from config import CHAT_ID, STUDENT_LIST, TOKEN, DataManager
 from utils import DutyBot
-import datetime
 
 
 def main():

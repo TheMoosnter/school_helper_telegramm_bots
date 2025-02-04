@@ -1,8 +1,9 @@
-import os
-from dotenv import load_dotenv
 import csv
-from loguru import logger
+import os
+
 import yaml
+from dotenv import load_dotenv
+from loguru import logger
 
 
 def load_students(file_path):
