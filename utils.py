@@ -72,7 +72,7 @@ class DutyBot:
         if self.mes:
             await self.bot.delete_message(self.chat_id, self.mes.message_id)
         logger.info(
-            f"Student {self.student_list[self.data_manager.get("id", 0)]} was marked as absent."
+            f'Student {self.student_list[self.data_manager.get("id", 0)]} was marked as absent.'
         )
         self.data_manager.append_to_list(
             "absent_students", self.student_list[self.data_manager.get("id", 0)]
