@@ -1,8 +1,10 @@
-import time
+import datetime
 from threading import Thread
+
 from loguru import logger
 from telebot import TeleBot
-from config import TOKEN, CHAT_ID, DATA_FILE
+
+from config import CHAT_ID, STUDENT_LIST, TOKEN, DataManager
 from utils import DutyBot
 
 
@@ -10,9 +12,12 @@ def main():
     """
     Entry point to the application. Initializes the bot and starts the main processes.
     """
-    logger.info("Запуск телеграм-бота")
+    logger.info("Launching a telegram bot")
+    now_one = datetime.datetime.now()
+    logger.info(f"Hours: {now_one.hour}, minutes: {now_one.minute}")
     bot = TeleBot(TOKEN)
-    duty_bot = DutyBot(bot, CHAT_ID)
+    data_manager = DataManager()
+    duty_bot = DutyBot(bot, CHAT_ID, STUDENT_LIST, data_manager)
 
     # Command handlers
     @bot.message_handler(commands=["start_day"])
@@ -37,7 +42,7 @@ def main():
         Command format: /put <Student_name>.
         """
         student_name = message.text.replace("/put ", "").strip()
-        duty_bot.process_put(student_name)
+        duty_bot.process_put(student_name, message.chat.id)
 
     @bot.message_handler(commands=["set"])
     def set_duty(message):
@@ -46,7 +51,7 @@ def main():
         Command format: /set <Student_name>.
         """
         student_name = message.text.replace("/set ", "").strip()
-        duty_bot.process_set(student_name)
+        duty_bot.process_set(student_name, message.chat.id)
 
     @bot.message_handler(commands=["skip_queue"])
     def skip_without_queue(message):
