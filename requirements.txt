@@ -2,3 +2,4 @@ aiogram
 loguru
 apscheduler
 python-dotenv
+pyyaml
