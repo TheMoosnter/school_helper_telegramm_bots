@@ -1,6 +1,3 @@
-import datetime
-import time
-
 from loguru import logger
 
 
@@ -132,16 +129,20 @@ class DutyBot:
         await self.check_id()
         await self.new_day()
 
-    async def check_time(self):
-        """
-        Background task for checking time. Updates the duty officer every day at 8:00.
-        """
-        while True:
-            now = datetime.datetime.now()
-            if now.weekday() < 6 and now.hour == 23 and now.minute == 10:
-                logger.info("Day duty update")
-                await self.end_day()
-                await self.new_day()
-                time.sleep(60)
-            else:
-                time.sleep(59)
+    # async def check_time(self):
+    #     """
+    #     Background task for checking time. Updates the duty officer every day at 8:00.
+    #     """
+    #     while True:
+    #         now = datetime.datetime.now()
+    #         if now.hour == 21 and now.minute == 18: #now.weekday() < 6 and
+    #             logger.info("Day duty update")
+    #             await self.end_day()
+    #             await self.new_day()
+    #             await sleep(60)
+    #         else:
+    #             await sleep(60)
+    async def time_duty_set(self):
+        logger.info("Day duty update")
+        await self.end_day()
+        await self.new_day()
